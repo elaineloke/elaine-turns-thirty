@@ -17,7 +17,6 @@ export const RSVPForm = () => {
     name: '',
     email: '',
     attending: '',
-    guests: '1',
     message: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -64,14 +63,16 @@ export const RSVPForm = () => {
     setSubmitStatus(null);
 
     try {
-      // TODO: Replace with your actual API endpoint
-      const response = await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+			const response = await fetch('http://localhost:3000/api/rsvp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: formData.name,
+					attending: formData.attending,
+					notes: formData.message || ''
+				}),
+			});
+
 
       if (response.ok) {
         setSubmitStatus('success');
@@ -79,13 +80,13 @@ export const RSVPForm = () => {
           name: '',
           email: '',
           attending: 'yes',
-          guests: '1',
           message: ''
         });
       } else {
         setSubmitStatus('error');
       }
     } catch (error) {
+      console.error('Error submitting RSVP:', error); 
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -159,30 +160,6 @@ export const RSVPForm = () => {
           />
         </RadioGroup>
       </FormControl>
-
-      {formData.attending === 'yes' && (
-        <FormControl component="fieldset" sx={styles.radioGroup}>
-          <Typography variant="subtitle1" sx={styles.radioLabel}>
-            Number of guests (including you)
-          </Typography>
-          <RadioGroup
-            row
-            name="guests"
-            value={formData.guests}
-            onChange={handleChange}
-          >
-            {['1', '2', '3', '4'].map((num) => (
-              <FormControlLabel
-                key={num}
-                value={num}
-                control={<Radio sx={styles.radio} />}
-                label={num}
-                disabled={isSubmitting}
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
-      )}
 
       <TextField
         fullWidth
