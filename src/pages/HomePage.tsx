@@ -1,14 +1,11 @@
-import React from 'react';
 import {
   Box,
   Typography,
   Container,
-  useTheme
 } from '@mui/material';
 import { RSVPForm } from '../components/RSVPForm';
 
 export const HomePage = () => {
-  const theme = useTheme();
 
   return (
     <Box sx={styles.mainContainer}>
@@ -79,7 +76,6 @@ const styles = {
     width: '100vw',
     // Background covers entire viewport
     backgroundImage: 'url("https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")',
-    backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundAttachment: 'fixed',
@@ -126,7 +122,6 @@ const styles = {
   whisperText: {
     fontSize: '24px',
     fontFamily: "'Allura', cursive",
-    color: '#666',
     marginBottom: '-10px',
     color: '#874000',
   },
