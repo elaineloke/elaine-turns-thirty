@@ -61,7 +61,7 @@ export const RSVPForm = () => {
     setSubmitStatus(null);
   
     try {
-      const response = await fetch('http://localhost:3000/api/rsvp', {
+      const response = await fetch('https://elaine-turns-thirty.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
