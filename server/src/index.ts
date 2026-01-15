@@ -1,15 +1,16 @@
-import express from "express"
-import cors from "cors"
-import rsvpRouter from "./routes/rsvp"
+import express from "express";
+import cors from "cors";
+import { rsvpRouter } from "./routes/rsvp";
 
-const app = express()
-const PORT = 3000
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-app.use("/api/rsvp", rsvpRouter)
+app.use("/api/rsvp", rsvpRouter);
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
-})
+  console.log(`RSVP server running on port ${PORT}`);
+});

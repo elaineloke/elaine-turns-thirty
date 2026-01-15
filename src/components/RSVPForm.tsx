@@ -54,26 +54,24 @@ export const RSVPForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  
+    if (!validateForm()) return;
+  
     setIsSubmitting(true);
     setSubmitStatus(null);
-
+  
     try {
-			const response = await fetch('http://localhost:3000/api/rsvp', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name: formData.name,
-					attending: formData.attending,
-					notes: formData.message || ''
-				}),
-			});
-
-
+      const response = await fetch('http://localhost:3000/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          attending: formData.attending,
+          message: formData.message || ''
+        }),
+      });
+  
       if (response.ok) {
         setSubmitStatus('success');
         setFormData({
@@ -86,12 +84,13 @@ export const RSVPForm = () => {
         setSubmitStatus('error');
       }
     } catch (error) {
-      console.error('Error submitting RSVP:', error); 
+      console.error('Error submitting RSVP:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={styles.form}>
