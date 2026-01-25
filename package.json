@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,scss,md}'",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "preview": "vite preview",
-    "watch:format": "chokidar 'src/**/*.{ts,tsx}' -c 'npm run format'"
+    "watch:format": "chokidar 'src/**/*.{ts,tsx}' -c 'npm run format'",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,json,css,scss,md}'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
