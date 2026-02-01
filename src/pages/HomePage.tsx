@@ -1,15 +1,47 @@
 import { Box, Typography, Container } from '@mui/material';
 import { RSVPForm } from '../components/RSVPForm';
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
+import { useState } from 'react';
 
 export const HomePage = () => {
+  const { width, height } = useWindowSize();
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  // Called after successful "yes" RSVP
+  const handleRsvpYes = () => {
+    setShowConfetti(true);
+    setFadeOut(false);
+
+    setTimeout(() => setFadeOut(true), 5000);
+    setTimeout(() => setShowConfetti(false), 7000);
+  };
+
   return (
     <Box sx={styles.mainContainer}>
+      {showConfetti && (
+        <Box
+          sx={{
+            ...styles.confettiBox,
+            opacity: fadeOut ? 0 : 1,
+          }}
+        >
+          <Confetti
+            width={width}
+            height={height}
+            numberOfPieces={700}
+            gravity={0.15}
+            recycle={true}
+          />
+        </Box>
+      )}
       <Box sx={styles.headerSection}>
         <Typography variant="body1" sx={styles.whisperText}>
-          shhh... it&apos;s a
+          Can I keep the presents and stay
         </Typography>
         <Typography variant="h1" sx={styles.surpriseText}>
-          Surprise!
+          Twenty Nine?
         </Typography>
       </Box>
 
@@ -40,10 +72,10 @@ export const HomePage = () => {
             6PM ONWARDS
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
-            DUCK & WAFFLE
+            STICKY MANGO
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
-            110 BISHOPSGATE, LONDON EC2N 4AY
+            36C SHAD THAMES, LONDON SE1 2YE
           </Typography>
         </Box>
 
@@ -55,15 +87,13 @@ export const HomePage = () => {
 
           {/* RSVP Form */}
           <Box sx={styles.formContainer}>
-            <RSVPForm />
+            <RSVPForm onYesSubmit={handleRsvpYes} />
           </Box>
         </Box>
       </Container>
     </Box>
   );
 };
-
-// 'url("https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")'
 
 const styles = {
   mainContainer: {
@@ -109,6 +139,16 @@ const styles = {
         backgroundColor: 'rgba(255, 245, 247, 0.92)',
       },
     },
+  },
+  confettiBox: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    pointerEvents: 'none',
+    zIndex: 9999,
+    transition: 'opacity 1s ease-out',
   },
   headerSection: {
     textAlign: 'center',

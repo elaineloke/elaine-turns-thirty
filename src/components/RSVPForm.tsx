@@ -9,19 +9,28 @@ import {
   RadioGroup,
   Typography,
   Alert,
-  CircularProgress
+  CircularProgress,
+  FormHelperText,
 } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/CalendarToday';
 
-export const RSVPForm = () => {
+type RSVPFormProps = {
+  onYesSubmit?: () => void;
+};
+
+export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     attending: '',
-    message: ''
+    message: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+  const [submittedAttendance, setSubmittedAttendance] = useState<string | null>(null);
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -36,49 +45,57 @@ export const RSVPForm = () => {
       newErrors.email = 'Please enter a valid email';
     }
 
+    if (!formData.attending) {
+      newErrors.attending = 'Please select yes or no';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!validateForm()) return;
-  
+
     setIsSubmitting(true);
     setSubmitStatus(null);
-  
+
     try {
-      const response = await fetch('https://elaine-turns-thirty.onrender.com', {
+      const response = await fetch(`${API_URL}/api/rsvp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           attending: formData.attending,
-          message: formData.message || ''
+          message: formData.message || '',
         }),
       });
-  
+
       if (response.ok) {
+        // Trigger confetti for "yes"
+        if (formData.attending === 'yes') onYesSubmit?.();
+        
         setSubmitStatus('success');
+        setSubmittedAttendance(formData.attending);
         setFormData({
           name: '',
           email: '',
-          attending: 'yes',
-          message: ''
+          attending: '',
+          message: '',
         });
       } else {
         setSubmitStatus('error');
@@ -90,7 +107,6 @@ export const RSVPForm = () => {
       setIsSubmitting(false);
     }
   };
-  
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={styles.form}>
@@ -98,10 +114,33 @@ export const RSVPForm = () => {
         RSVP Form
       </Typography>
 
-      {submitStatus === 'success' && (
-        <Alert severity="success" sx={styles.alert}>
-          Thank you for your RSVP! We look forward to celebrating with you.
+      {submitStatus === 'success' && submittedAttendance === 'no' && (
+        <Alert severity="info" sx={styles.alert}>
+          Thank you for your RSVP. Sorry to hear you can't make it!
         </Alert>
+      )}
+
+      {submitStatus === 'success' && submittedAttendance === 'yes' && (
+        <>
+          <Alert severity="success" sx={styles.alert}>
+            Thank you for your RSVP! We look forward to celebrating with you.
+          </Alert>
+          <Button
+            variant="contained"
+            startIcon={<GoogleIcon />}
+            sx={styles.googleCalendarButton}
+            href={
+              'https://www.google.com/calendar/render?action=TEMPLATE' +
+              `&text=${encodeURIComponent("Elaine's 30th Birthday")}` +
+              `&dates=${'20260228T180000Z'}/${'20260228T210000Z'}` +
+              `&details=${encodeURIComponent("Join us at Sticky Mango, where we'll feast on Southeast Asian food with a spectacular view of Tower Bridge.")}` +
+              `&location=${encodeURIComponent('Sticky Mango Tower Bridge 36C Shad Thames, London SE1 2YE')}`
+            }
+            target="_blank"
+          >
+            Add to Google Calendar
+          </Button>
+        </>
       )}
 
       {submitStatus === 'error' && (
@@ -135,16 +174,11 @@ export const RSVPForm = () => {
         disabled={isSubmitting}
       />
 
-      <FormControl component="fieldset" sx={styles.radioGroup}>
+      <FormControl component="fieldset" sx={styles.radioGroup} error={!!errors.attending}>
         <Typography variant="subtitle1" sx={styles.radioLabel}>
           Will you be attending?
         </Typography>
-        <RadioGroup
-          row
-          name="attending"
-          value={formData.attending}
-          onChange={handleChange}
-        >
+        <RadioGroup row name="attending" value={formData.attending} onChange={handleChange}>
           <FormControlLabel
             value="yes"
             control={<Radio sx={styles.radio} />}
@@ -158,6 +192,7 @@ export const RSVPForm = () => {
             disabled={isSubmitting}
           />
         </RadioGroup>
+        {errors.attending && <FormHelperText>{errors.attending}</FormHelperText>}
       </FormControl>
 
       <TextField
@@ -179,11 +214,7 @@ export const RSVPForm = () => {
         sx={styles.submitButton}
         disabled={isSubmitting}
       >
-        {isSubmitting ? (
-          <CircularProgress size={24} sx={styles.spinner} />
-        ) : (
-          'Submit RSVP'
-        )}
+        {isSubmitting ? <CircularProgress size={24} sx={styles.spinner} /> : 'Submit RSVP'}
       </Button>
     </Box>
   );
@@ -256,5 +287,22 @@ const styles = {
   },
   spinner: {
     color: '#fff',
+  },
+  googleCalendarButton: {
+    backgroundColor: '#4285F4',
+    color: '#fff',
+    fontWeight: 600,
+    textTransform: 'none',
+    padding: '10px 16px',
+    fontSize: '16px',
+    borderRadius: '4px',
+    '&:hover': {
+      backgroundColor: '#357ae8',
+    },
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: '-10px',
+    marginBottom: '-10px',
   },
 };
