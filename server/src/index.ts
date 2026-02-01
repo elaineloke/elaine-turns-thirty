@@ -24,3 +24,21 @@ app.get("/api/rsvp", (req, res) => {
     res.json(rows);
   });
 });
+
+app.delete('/rsvp/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM rsvp WHERE id = ?', [id], function (err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Failed to delete RSVP' });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'RSVP not found' });
+    }
+
+    res.json({ success: true });
+  });
+});
+

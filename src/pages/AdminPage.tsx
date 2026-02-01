@@ -1,8 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, TextField, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Paper,
+  TextField,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+} from '@mui/material';
 import { theme } from '../theme';
+import { MOCK_RSVPS } from '../mocks/mockRsvp';
+import { useDeleteRsvp } from '../hooks/useDeleteRsvp';
 
-type RsvpRecord = {
+export type RsvpRecord = {
   id: number;
   name: string;
   email: string;
@@ -16,8 +29,30 @@ export const AdminPage = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState('');
 
-  const [rsvps, setRsvps] = useState<RsvpRecord[]>([]);
+  const [rsvps, setRsvps] = useState<RsvpRecord[] | null>(null);
   const apiUrl = import.meta.env.VITE_API_URL;
+  const isLocal = window.location.hostname === 'localhost';
+
+  const fetchRsvps = async () => {
+    if (isLocal) {
+      setRsvps(MOCK_RSVPS);
+      return;
+    }
+    setRsvps(null);
+    try {
+      const res = await fetch(`${apiUrl}/api/rsvp`);
+      const data: RsvpRecord[] = await res.json();
+      setRsvps(data);
+    } catch (err) {
+      console.error('Failed to fetch RSVPs:', err);
+      setRsvps([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchRsvps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiUrl]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,11 +65,16 @@ export const AdminPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetch(`${apiUrl}/api/rsvp`)
-      .then((res) => res.json())
-      .then((data: RsvpRecord[]) => setRsvps(data));
-  }, [apiUrl]);
+  const {
+    deleteTarget,
+    loading: deleteLoading,
+    error: deleteError,
+    handleDelete,
+    cancelDelete,
+    confirmDelete,
+  } = useDeleteRsvp((id) => {
+    setRsvps((prev) => prev?.filter((r) => r.id !== id) ?? null);
+  });
 
   if (!authorised) {
     return (
@@ -67,6 +107,25 @@ export const AdminPage = () => {
     );
   }
 
+  // Show loading spinner while fetching
+  if (rsvps === null) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography mt={2}>Loading RSVPs...</Typography>
+      </Box>
+    );
+  }
+
+  // Show no rsvp if empty
+  if (rsvps.length === 0) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography>No RSVPs found.</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 4 }}>
       <Typography variant="h4" mb={2} sx={{ color: theme.palette.primary.main }}>
@@ -87,9 +146,42 @@ export const AdminPage = () => {
           <Typography>
             <b>Message:</b> {rsvp.message}
           </Typography>
-          <Typography variant="caption">{rsvp.created_at}</Typography>
+          <Typography variant="caption" display="block" mb={1}>
+            {new Date(rsvp.created_at).toLocaleString()}
+          </Typography>
+
+          <Button variant="outlined" color="error" size="small" onClick={() => handleDelete(rsvp)}>
+            Delete
+          </Button>
         </Paper>
       ))}
+
+      <Dialog open={!!deleteTarget} onClose={cancelDelete}>
+        <DialogTitle>Delete RSVP</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete <b>{deleteTarget?.name}</b>?
+          </Typography>
+
+          {deleteError && (
+            <Typography color="error" mt={1}>
+              {deleteError}
+            </Typography>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={cancelDelete}>Cancel</Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={confirmDelete}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? 'Deleting...' : 'Yes, delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
@@ -100,7 +192,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.palette.background.default, // #fff5f7
+    backgroundColor: theme.palette.background.default,
     padding: 2,
   },
   card: {
@@ -115,11 +207,11 @@ const styles = {
     borderRadius: 3,
   },
   title: {
-    color: theme.palette.primary.main, // #ec407a
+    color: theme.palette.primary.main,
     textAlign: 'center' as const,
   },
   subtitle: {
-    color: theme.palette.secondary.main, // #ad1457
+    color: theme.palette.secondary.main,
     textAlign: 'center' as const,
   },
   form: {
