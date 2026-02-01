@@ -1,12 +1,7 @@
-import {
-  Box,
-  Typography,
-  Container,
-} from '@mui/material';
+import { Box, Typography, Container } from '@mui/material';
 import { RSVPForm } from '../components/RSVPForm';
 
 export const HomePage = () => {
-
   return (
     <Box sx={styles.mainContainer}>
       <Box sx={styles.headerSection}>
@@ -42,7 +37,7 @@ export const HomePage = () => {
             SATURDAY, FEBRUARY 28TH
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
-           6PM ONWARDS
+            6PM ONWARDS
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
             DUCK & WAFFLE
@@ -72,10 +67,12 @@ export const HomePage = () => {
 
 const styles = {
   mainContainer: {
+    margin: '-8px',
     minHeight: '100vh',
     width: '100vw',
     // Background covers entire viewport
-    backgroundImage: 'url("https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")',
+    backgroundImage:
+      'url("https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundAttachment: 'fixed',
@@ -140,8 +137,8 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: {
-      xs: '0px 15px',  // Mobile
-      md: '0px 20px',  // Desktop
+      xs: '0px 15px', // Mobile
+      md: '0px 20px', // Desktop
     },
   },
   joinUsSection: {
@@ -165,14 +162,14 @@ const styles = {
   birthdayName: {
     fontSize: '80px',
     fontFamily: "'Kapakana Variable', cursive",
-    fontWeight: 700,
+    fontWeight: 500,
     color: '#ad1457',
     marginBottom: '-10px',
   },
   birthdayAge: {
     fontSize: '48px',
     fontFamily: "'Kapakana Variable', cursive",
-    fontWeight: 700,
+    fontWeight: 400,
     letterSpacing: '2px',
     color: '#c2185b',
   },
