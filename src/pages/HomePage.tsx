@@ -1,4 +1,5 @@
-import { Box, Typography, Container } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, Button } from '@mui/material';
 import { RSVPForm } from '../components/RSVPForm';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
@@ -8,6 +9,11 @@ export const HomePage = () => {
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+
+  const navigate = useNavigate();
+  const navigateToFaq = () => {
+    navigate('/faq');
+  };
 
   // Called after successful "yes" RSVP
   const handleRsvpYes = () => {
@@ -69,20 +75,31 @@ export const HomePage = () => {
             SATURDAY, FEBRUARY 28TH
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
-            6PM ONWARDS
+            6:30PM ONWARDS
           </Typography>
-          <Typography variant="h5" sx={styles.detailText}>
-            STICKY MANGO
+          <Typography
+            variant="h5"
+            sx={{
+              ...styles.detailText,
+              color: '#874000',
+              textDecoration: 'underline',
+            }}
+          >
+            STICKY MANGO, TOWER BRIDGE
           </Typography>
           <Typography variant="h5" sx={styles.detailText}>
             36C SHAD THAMES, LONDON SE1 2YE
           </Typography>
         </Box>
 
+        <Button variant="outlined" sx={styles.faqButton} onClick={navigateToFaq}>
+          FAQs
+        </Button>
+
         {/* RSVP Section */}
         <Box sx={styles.rsvpSection}>
           <Typography variant="h6" sx={styles.rsvpDeadline}>
-            RSVP BELOW BY FEBRUARY 10TH
+            RSVP BELOW BY FEBRUARY 20TH
           </Typography>
 
           {/* RSVP Form */}
@@ -198,6 +215,7 @@ const styles = {
   birthdaySection: {
     textAlign: 'center',
     marginBottom: '30px',
+    marginTop: '-24px',
   },
   birthdayName: {
     fontSize: '80px',
@@ -246,5 +264,15 @@ const styles = {
     borderRadius: '8px',
     padding: '30px',
     boxShadow: '0px 4px 20px rgba(0,0,0,0.08)',
+  },
+  faqButton: {
+    marginTop: '-54px',
+    marginBottom: '24px',
+    borderColor: '#AD1457',
+    color: '#874000',
+    '&:hover': {
+      borderColor: '#AD1457',
+      backgroundColor: 'rgba(173, 20, 87, 0.1)',
+    },
   },
 };

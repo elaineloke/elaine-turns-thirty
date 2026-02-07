@@ -21,7 +21,6 @@ type RSVPFormProps = {
 export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     attending: '',
     message: '',
   });
@@ -37,12 +36,6 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
     }
 
     if (!formData.attending) {
@@ -79,7 +72,6 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
-          email: formData.email,
           attending: formData.attending,
           message: formData.message || '',
         }),
@@ -88,12 +80,11 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
       if (response.ok) {
         // Trigger confetti for "yes"
         if (formData.attending === 'yes') onYesSubmit?.();
-        
+
         setSubmitStatus('success');
         setSubmittedAttendance(formData.attending);
         setFormData({
           name: '',
-          email: '',
           attending: '',
           message: '',
         });
@@ -123,7 +114,7 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
       {submitStatus === 'success' && submittedAttendance === 'yes' && (
         <>
           <Alert severity="success" sx={styles.alert}>
-            Thank you for your RSVP! We look forward to celebrating with you.
+            Thank you for your RSVP! Can't wait to celebrate with you.
           </Alert>
           <Button
             variant="contained"
@@ -132,7 +123,7 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
             href={
               'https://www.google.com/calendar/render?action=TEMPLATE' +
               `&text=${encodeURIComponent("Elaine's 30th Birthday")}` +
-              `&dates=${'20260228T180000Z'}/${'20260228T210000Z'}` +
+              `&dates=${'20260228T183000Z'}/${'20260228T220000Z'}` +
               `&details=${encodeURIComponent("Join us at Sticky Mango, where we'll feast on Southeast Asian food with a spectacular view of Tower Bridge.")}` +
               `&location=${encodeURIComponent('Sticky Mango Tower Bridge 36C Shad Thames, London SE1 2YE')}`
             }
@@ -149,73 +140,61 @@ export const RSVPForm = ({ onYesSubmit }: RSVPFormProps) => {
         </Alert>
       )}
 
-      <TextField
-        fullWidth
-        label="Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        error={!!errors.name}
-        helperText={errors.name}
-        sx={styles.textField}
-        disabled={isSubmitting}
-      />
-
-      <TextField
-        fullWidth
-        label="Email"
-        name="email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        error={!!errors.email}
-        helperText={errors.email}
-        sx={styles.textField}
-        disabled={isSubmitting}
-      />
-
-      <FormControl component="fieldset" sx={styles.radioGroup} error={!!errors.attending}>
-        <Typography variant="subtitle1" sx={styles.radioLabel}>
-          Will you be attending?
-        </Typography>
-        <RadioGroup row name="attending" value={formData.attending} onChange={handleChange}>
-          <FormControlLabel
-            value="yes"
-            control={<Radio sx={styles.radio} />}
-            label="Yes, I'll be there!"
+      {submitStatus !== 'success' && (
+        <>
+          <TextField
+            fullWidth
+            label="Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            error={!!errors.name}
+            helperText={errors.name}
+            sx={styles.textField}
             disabled={isSubmitting}
           />
-          <FormControlLabel
-            value="no"
-            control={<Radio sx={styles.radio} />}
-            label="Sorry, can't make it"
+          <FormControl component="fieldset" sx={styles.radioGroup} error={!!errors.attending}>
+            <Typography variant="subtitle1" sx={styles.radioLabel}>
+              Will you be attending?
+            </Typography>
+            <RadioGroup row name="attending" value={formData.attending} onChange={handleChange}>
+              <FormControlLabel
+                value="yes"
+                control={<Radio sx={styles.radio} />}
+                label="Yes, I'll be there!"
+                disabled={isSubmitting}
+              />
+              <FormControlLabel
+                value="no"
+                control={<Radio sx={styles.radio} />}
+                label="Sorry, can't make it"
+                disabled={isSubmitting}
+              />
+            </RadioGroup>
+            {errors.attending && <FormHelperText>{errors.attending}</FormHelperText>}
+          </FormControl>
+          <TextField
+            fullWidth
+            label="Message (optional)"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            multiline
+            rows={3}
+            sx={styles.textField}
             disabled={isSubmitting}
           />
-        </RadioGroup>
-        {errors.attending && <FormHelperText>{errors.attending}</FormHelperText>}
-      </FormControl>
-
-      <TextField
-        fullWidth
-        label="Message (optional)"
-        name="message"
-        value={formData.message}
-        onChange={handleChange}
-        multiline
-        rows={3}
-        sx={styles.textField}
-        disabled={isSubmitting}
-      />
-
-      <Button
-        type="submit"
-        variant="contained"
-        fullWidth
-        sx={styles.submitButton}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? <CircularProgress size={24} sx={styles.spinner} /> : 'Submit RSVP'}
-      </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={styles.submitButton}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? <CircularProgress size={24} sx={styles.spinner} /> : 'Submit RSVP'}
+          </Button>
+        </>
+      )}
     </Box>
   );
 };
@@ -263,6 +242,7 @@ const styles = {
     color: '#555',
     marginBottom: '10px',
     fontWeight: 500,
+    alignSelf: 'self-start',
   },
   radio: {
     color: '#f48fb1',
