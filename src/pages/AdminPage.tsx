@@ -18,7 +18,6 @@ import { useDeleteRsvp } from '../hooks/useDeleteRsvp';
 export type RsvpRecord = {
   id: number;
   name: string;
-  email: string;
   attending: string;
   message: string | null;
   created_at: string;
@@ -136,9 +135,6 @@ export const AdminPage = () => {
         <Paper key={rsvp.id} sx={{ p: 2, mb: 2 }}>
           <Typography>
             <b>Name:</b> {rsvp.name}
-          </Typography>
-          <Typography>
-            <b>Email:</b> {rsvp.email}
           </Typography>
           <Typography>
             <b>Attending:</b> {rsvp.attending}

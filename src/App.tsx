@@ -9,13 +9,17 @@ import '@fontsource/playfair-display';
 import '@fontsource-variable/kapakana';
 import '@fontsource/allura';
 import '@fontsource/sacramento';
+import { FaqPage } from './pages/FaqPage';
+import { ScrollToTop } from './components/ScrollToTop';
 
 export const App = () => {
   return (
     <ThemeProvider theme={theme}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/faq" element={<FaqPage />} />
       </Routes>
     </ThemeProvider>
   );
